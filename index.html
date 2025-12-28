@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fossil Power Plants Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Toggle Button (Mobile) -->
+        <button class="sidebar-toggle" id="sidebarToggle">
+            <span>☰</span>
+        </button>
+
+        <!-- Left Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h1>⚡ Fossil Power Plants</h1>
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Search plants...">
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters-section">
+                <div class="filter-header">
+                    <span>Filters</span>
+                    <button id="clearFilters" class="btn-clear">Clear</button>
+                </div>
+
+                <div class="filter-group">
+                    <label>Country</label>
+                    <div class="custom-select" id="countrySelect">
+                        <div class="select-trigger">Select countries...</div>
+                        <div class="select-options" id="countryOptions"></div>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label>Fuel Type</label>
+                    <div class="custom-select" id="fuelSelect">
+                        <div class="select-trigger">Select fuels...</div>
+                        <div class="select-options" id="fuelOptions"></div>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label>Supplier</label>
+                    <div class="custom-select" id="supplierSelect">
+                        <div class="select-trigger">Select suppliers...</div>
+                        <div class="select-options" id="supplierOptions"></div>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label>Capacity: <span id="capacityValue">0 - 5000</span> MW</label>
+                    <div class="range-slider">
+                        <input type="range" id="minCapacity" min="0" max="5000" value="0" step="50">
+                        <input type="range" id="maxCapacity" min="0" max="5000" value="5000" step="50">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Plant List -->
+            <div class="plant-list" id="plantList">
+                <!-- Dynamic content -->
+            </div>
+        </aside>
+
+        <!-- Main Map Area -->
+        <div class="main-content">
+            <!-- Statistics Dashboard -->
+            <div class="stats-dashboard">
+                <div class="stat-card">
+                    <div class="stat-icon">🏭</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="statTotal">0</div>
+                        <div class="stat-label">Total Plants</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⚡</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="statCapacity">0 GW</div>
+                        <div class="stat-label">Total Capacity</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🌍</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="statCountries">0</div>
+                        <div class="stat-label">Countries</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🏢</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="statSuppliers">0</div>
+                        <div class="stat-label">Suppliers</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="map">
+                <!-- Fuel Type Legend - INSIDE MAP -->
+                <div class="fuel-legend">
+                    <h4>Fuel Types</h4>
+                    <div id="legendContent"></div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3>Plants by Country</h3>
+                    <div class="chart-container"><canvas id="countryChart"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h3>Capacity Distribution</h3>
+                    <div class="chart-container"><canvas id="capacityChart"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h3>Fuel Type Distribution</h3>
+                    <div class="chart-container"><canvas id="fuelChart"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h3>Suppliers Market Share</h3>
+                    <div class="chart-container"><canvas id="supplierChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supplier Details Modal -->
+    <div id="supplierModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close">&times;</button>
+            <div id="supplierDetails">
+                <!-- Dynamic content -->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,40 @@
+# Python files
+*.py
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
+
+# Verification and temporary files
+*verification*.py
+*batch*.py
+*verified*.py
+*progress*.py
+*amendments*.py
+apply_*.py
+complete_*.py
+get_next_*.py
+add_*.py
+
+# Documentation files (keep only README.md)
+VERIFICATION_COMPLETE.md
+verification_progress_report.md
+detailed_verification_findings.md
+session_summary.md
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+
+# Any other CSV files except the main data
+# (uncomment if you want to exclude other CSVs)
+# *.csv
+# !eu_fossil_powerplants_with_suppliers.csv
