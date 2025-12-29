@@ -34,10 +34,13 @@ const supplierData = {
 
 function initMap() {
     map = L.map('map', { zoomControl: false }).setView([50.5, 10.0], 5);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+
+    // Light theme map tiles
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
         attribution: '© OpenStreetMap © CARTO',
         maxZoom: 20
     }).addTo(map);
+
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 }
 
@@ -83,7 +86,7 @@ function loadData() {
 function createLegend() {
     const fuels = {
         'Natural gas': '#7aa2f7',
-        'Hard coal': '#565f89',
+        'Hard coal': '#6e7681',
         'Lignite': '#e0af68',
         'Oil': '#bb9af7',
         'Mixed fossil fuels': '#f7768e'
@@ -424,19 +427,19 @@ function updateStats() {
 }
 
 function createCharts() {
-    Chart.defaults.color = '#8b949e';
-    Chart.defaults.borderColor = '#2d3436';
+    Chart.defaults.color = '#586069';
+    Chart.defaults.borderColor = '#e1e4e8';
 
-    // Vibrant gradient colors matching green theme
+    // Light theme muted colors with green accent
     const chartColors = [
-        'rgba(0, 255, 65, 0.8)',    // Neon green
-        'rgba(116, 185, 255, 0.8)', // Blue
-        'rgba(162, 155, 254, 0.8)', // Purple
-        'rgba(255, 215, 0, 0.8)',   // Gold
-        'rgba(255, 71, 87, 0.8)',   // Red
-        'rgba(253, 121, 168, 0.8)', // Pink
-        'rgba(0, 204, 52, 0.8)',    // Dark green
-        'rgba(255, 153, 0, 0.8)'    // Orange
+        'rgba(45, 95, 63, 0.8)',    // Forest green (accent)
+        'rgba(122, 162, 247, 0.7)', // Soft blue
+        'rgba(187, 154, 247, 0.7)', // Soft purple  
+        'rgba(224, 175, 104, 0.7)', // Soft orange
+        'rgba(247, 118, 142, 0.7)', // Soft pink
+        'rgba(110, 118, 129, 0.7)', // Gray
+        'rgba(40, 167, 69, 0.7)',   // Green
+        'rgba(253, 140, 115, 0.7)'  // Coral
     ];
 
     // Country chart
@@ -509,14 +512,14 @@ function createCharts() {
                 data: Object.values(fuelData),
                 backgroundColor: chartColors,
                 borderWidth: 2,
-                borderColor: '#0a0e13'
+                borderColor: '#ffffff'
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { position: 'right', labels: { color: '#e6e6e6' } }
+                legend: { position: 'right', labels: { color: '#24292e' } }
             }
         }
     });
@@ -549,7 +552,7 @@ function createCharts() {
             indexAxis: 'y',
             plugins: { legend: { display: false } },
             scales: {
-                x: { beginAtZero: true, grid: { color: 'rgba(45, 52, 54, 0.5)' } },
+                x: { beginAtZero: true, grid: { color: 'rgba(225, 228, 232, 0.5)' } },
                 y: { grid: { display: false } }
             }
         }
