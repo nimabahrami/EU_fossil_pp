@@ -263,18 +263,26 @@ function updateDisplay() {
 
     // Update plant list
     const plantList = document.getElementById('plantList');
-    plantList.innerHTML = filteredPlants.slice(0, 50).map(plant => `
-        <div class="plant-item" data-lat="${plant.lat}" data-lon="${plant.lon}">
+    plantList.innerHTML = ''; // Clear existing list items
+    filteredPlants.slice(0, 50).forEach(plant => {
+        const item = document.createElement('div');
+        item.className = 'plant-item';
+        item.dataset.lat = plant.lat;
+        item.dataset.lon = plant.lon;
+
+        const fuelLetter = getFuelIcon(plant.energy_source);
+
+        item.innerHTML = `
             <div class="plant-item-header">
-                <div class="plant-icon">${getFuelIcon(plant.energy_source)}</div>
+                <div class="plant-icon">${fuelLetter}</div>
                 <div class="plant-info">
                     <h4>${plant.name || 'Unknown'}</h4>
                     <p>${plant.country || 'N/A'} • ${plant.capacity || '0'} MW</p>
                 </div>
             </div>
-        </div>
-    `).join('');
-
+        `;
+        plantList.appendChild(item);
+    });
     plantList.querySelectorAll('.plant-item').forEach(item => {
         item.addEventListener('click', () => {
             map.setView([parseFloat(item.dataset.lat), parseFloat(item.dataset.lon)], 12);
@@ -318,8 +326,8 @@ function createPopupContent(plant) {
         <div class="popup-header">
             <h3>${plant.name || 'Unknown Plant'}</h3>
             <div class="popup-meta">
-                <span>${getFuelIcon(plant.energy_source)} ${plant.energy_source || 'Unknown'}</span>
-                <span>📍 ${plant.country || 'N/A'}</span>
+                <span>${plant.energy_source || 'Unknown'}</span>
+                <span>${plant.country || 'N/A'}</span>
             </div>
         </div>
         <div class="popup-body">
@@ -414,16 +422,24 @@ document.querySelector('.modal-close').addEventListener('click', () => {
 });
 
 function updateStats() {
+    const totalPlants = filteredPlants.length;
     const totalCapacity = filteredPlants.reduce((sum, p) => sum + (parseFloat(p.capacity) || 0), 0);
-    const countries = [...new Set(filteredPlants.map(p => p.country))];
-    const suppliers = [...new Set(filteredPlants.flatMap(p =>
-        p.Supplier ? p.Supplier.split(';').map(s => s.trim()) : []
-    ))].filter(s => s && s !== 'Unknown');
+    const countries = new Set(filteredPlants.map(p => p.country)).size;
+    const suppliers = new Set();
+    filteredPlants.forEach(p => {
+        if (p.Supplier) p.Supplier.split(';').forEach(s => suppliers.add(s.trim()));
+    });
 
-    document.getElementById('statTotal').textContent = filteredPlants.length;
-    document.getElementById('statCapacity').textContent = (totalCapacity / 1000).toFixed(1) + ' GW';
-    document.getElementById('statCountries').textContent = countries.length;
-    document.getElementById('statSuppliers').textContent = suppliers.length;
+    document.getElementById('totalPlants').textContent = totalPlants;
+    document.getElementById('totalCapacity').textContent = `${(totalCapacity / 1000).toFixed(1)} GW`;
+    document.getElementById('totalCountries').textContent = countries;
+    document.getElementById('totalSuppliers').textContent = suppliers.size;
+
+    // Update icons to letters
+    document.querySelector('#totalPlants').closest('.stat-card').querySelector('.stat-icon').textContent = 'P';
+    document.querySelector('#totalCapacity').closest('.stat-card').querySelector('.stat-icon').textContent = 'C';
+    document.querySelector('#totalCountries').closest('.stat-card').querySelector('.stat-icon').textContent = 'G';
+    document.querySelector('#totalSuppliers').closest('.stat-card').querySelector('.stat-icon').textContent = 'S';
 }
 
 function createCharts() {
@@ -500,7 +516,7 @@ function createCharts() {
         }
     });
 
-    // Fuel type chart
+    // Fuel type chart with rounded segments
     const fuelData = {};
     filteredPlants.forEach(p => fuelData[p.energy_source] = (fuelData[p.energy_source] || 0) + 1);
 
@@ -512,14 +528,16 @@ function createCharts() {
                 data: Object.values(fuelData),
                 backgroundColor: chartColors,
                 borderWidth: 2,
-                borderColor: '#ffffff'
+                borderColor: '#ffffff',
+                borderRadius: 8,
+                spacing: 2
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { position: 'right', labels: { color: '#24292e' } }
+                legend: { position: 'right', labels: { color: '#24292e', font: { size: 11 } } }
             }
         }
     });
@@ -552,8 +570,8 @@ function createCharts() {
             indexAxis: 'y',
             plugins: { legend: { display: false } },
             scales: {
-                x: { beginAtZero: true, grid: { color: 'rgba(225, 228, 232, 0.5)' } },
-                y: { grid: { display: false } }
+                x: { beginAtZero: true, grid: { color: 'rgba(225, 228, 232, 0.5)' }, ticks: { font: { size: 11 } } },
+                y: { grid: { display: false }, ticks: { font: { size: 11 } } }
             }
         }
     });
@@ -568,26 +586,27 @@ function updateCharts() {
 
 function getFuelColor(fuel) {
     const colors = {
-        'Natural gas': '#7aa2f7',  // Blue
-        'Hard coal': '#565f89',     // Dark gray
-        'Lignite': '#e0af68',       // Orange/yellow
-        'Oil': '#bb9af7',           // Purple
-        'Mixed fossil fuels': '#f7768e',  // Red/pink
-        'Non-renewable waste': '#ff9e64'  // Orange
+        'Natural gas': '#7aa2f7',
+        'Hard coal': '#6e7681',
+        'Lignite': '#e0af68',
+        'Oil': '#bb9af7',
+        'Mixed fossil fuels': '#f7768e',
+        'Non-renewable waste': '#ff7b72'
     };
-    return colors[fuel] || '#9ece6a';  // Green fallback
+    return colors[fuel] || '#9ece6a';
 }
 
 function getFuelIcon(fuel) {
+    // Return first letter instead of emoji
     const icons = {
-        'Natural gas': '🔥',
-        'Hard coal': '⚫',
-        'Lignite': '🟤',
-        'Oil': '🛢️',
-        'Mixed fossil fuels': '⚡',
-        'Non-renewable waste': '♻️'
+        'Natural gas': 'G',
+        'Hard coal': 'C',
+        'Lignite': 'L',
+        'Oil': 'O',
+        'Mixed fossil fuels': 'M',
+        'Non-renewable waste': 'W'
     };
-    return icons[fuel] || '⚡';
+    return icons[fuel] || 'P';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
