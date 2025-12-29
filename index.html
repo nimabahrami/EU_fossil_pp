@@ -4,9 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fossil Power Plants Map</title>
+    <title>EU Power Plants</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -20,7 +19,7 @@
         <!-- Left Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <h1>⚡ Fossil Power Plants</h1>
+                <h1>⚡ EU Power Plants</h1>
                 <div class="search-box">
                     <input type="text" id="searchInput" placeholder="Search plants...">
                 </div>
@@ -32,6 +31,9 @@
                     <span>Filters</span>
                     <button id="clearFilters" class="btn-clear">Clear</button>
                 </div>
+
+                <!-- Active Filters Chips -->
+                <div id="activeFilters" class="active-filters"></div>
 
                 <div class="filter-group">
                     <label>Country</label>
@@ -77,30 +79,30 @@
             <!-- Statistics Dashboard -->
             <div class="stats-dashboard">
                 <div class="stat-card">
-                    <div class="stat-icon">🏭</div>
+                    <div class="stat-icon">⚡</div>
                     <div class="stat-info">
-                        <div class="stat-value" id="statTotal">0</div>
+                        <div class="stat-value" id="totalPlants">0</div>
                         <div class="stat-label">Total Plants</div>
                     </div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon">⚡</div>
                     <div class="stat-info">
-                        <div class="stat-value" id="statCapacity">0 GW</div>
+                        <div class="stat-value" id="totalCapacity">0 GW</div>
                         <div class="stat-label">Total Capacity</div>
                     </div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon">🌍</div>
                     <div class="stat-info">
-                        <div class="stat-value" id="statCountries">0</div>
+                        <div class="stat-value" id="totalCountries">0</div>
                         <div class="stat-label">Countries</div>
                     </div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon">🏢</div>
                     <div class="stat-info">
-                        <div class="stat-value" id="statSuppliers">0</div>
+                        <div class="stat-value" id="totalSuppliers">0</div>
                         <div class="stat-label">Suppliers</div>
                     </div>
                 </div>

@@ -192,6 +192,7 @@ function initFilters() {
         minCap.value = 20;
         maxCap.value = maxCapacityInData;
         updateSlider();
+        updateFilterChips();
         applyFilters();
     });
 
@@ -214,6 +215,61 @@ function createCustomSelect(containerId, items, filterKey) {
             } else {
                 selectedFilters[filterKey] = selectedFilters[filterKey].filter(v => v !== e.target.value);
             }
+            updateFilterChips();
+            applyFilters();
+        });
+    });
+}
+
+function updateFilterChips() {
+    const chipsContainer = document.getElementById('activeFilters');
+    chipsContainer.innerHTML = '';
+
+    // Add fuel type chips
+    selectedFilters.fuels.forEach(fuel => {
+        const chip = document.createElement('div');
+        chip.className = 'filter-chip';
+        chip.innerHTML = `
+            <span>${fuel}</span>
+            <span class="filter-chip-remove" data-filter="fuels" data-value="${fuel}">×</span>
+        `;
+        chipsContainer.appendChild(chip);
+    });
+
+    // Add country chips
+    selectedFilters.countries.forEach(country => {
+        const chip = document.createElement('div');
+        chip.className = 'filter-chip';
+        chip.innerHTML = `
+            <span>${country}</span>
+            <span class="filter-chip-remove" data-filter="countries" data-value="${country}">×</span>
+        `;
+        chipsContainer.appendChild(chip);
+    });
+
+    // Add supplier chips
+    selectedFilters.suppliers.forEach(supplier => {
+        const chip = document.createElement('div');
+        chip.className = 'filter-chip';
+        chip.innerHTML = `
+            <span>${supplier}</span>
+            <span class="filter-chip-remove" data-filter="suppliers" data-value="${supplier}">×</span>
+        `;
+        chipsContainer.appendChild(chip);
+    });
+
+    // Add remove event listeners
+    chipsContainer.querySelectorAll('.filter-chip-remove').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const filterKey = btn.dataset.filter;
+            const value = btn.dataset.value;
+            selectedFilters[filterKey] = selectedFilters[filterKey].filter(v => v !== value);
+
+            // Uncheck the corresponding checkbox
+            const checkbox = document.querySelector(`input[data-filter="${filterKey}"][value="${value}"]`);
+            if (checkbox) checkbox.checked = false;
+
+            updateFilterChips();
             applyFilters();
         });
     });
@@ -316,7 +372,12 @@ function createMarker(plant) {
         }
     });
 
-    marker.bindPopup(createPopupContent(plant), { maxWidth: 320, className: 'custom-popup' });
+    marker.bindPopup(createPopupContent(plant), {
+        maxWidth: 320,
+        className: 'custom-popup',
+        autoPanPadding: [50, 50],
+        closeButton: true
+    });
     return marker;
 }
 
@@ -364,51 +425,53 @@ window.showSupplierDetails = function (supplierName) {
 
     document.getElementById('supplierDetails').innerHTML = `
         <div style="padding: 2rem;">
-            <h2 style="font-size: 1.75rem; margin-bottom: 0.5rem; color: var(--accent);">${supplierName}</h2>
-            <p style="color: var(--text-secondary); margin-bottom: 2rem;">Power Generation Equipment Manufacturer</p>
+            <div style="margin-bottom: 2rem;">
+                <h2 style="font-size: 1.75rem; margin-bottom: 0.25rem; color: var(--text-primary);">${supplierName}</h2>
+                <div style="color: var(--text-secondary); font-size: 0.875rem;">${data.headquarters}</div>
+            </div>
             
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2rem;">
-                <div style="background: var(--bg-tertiary); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border);">
-                    <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase;">Revenue</div>
-                    <div style="font-size: 1.75rem; font-weight: 700; color: var(--success);">${data.revenue}</div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+                <div style="background: var(--bg-tertiary); padding: 1.25rem; border-radius: 16px; border: 1.5px solid var(--border);">
+                    <div style="font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 600;">Revenue</div>
+                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--success);">${data.revenue}</div>
                 </div>
-                <div style="background: var(--bg-tertiary); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border);">
-                    <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase;">EBITDA</div>
-                    <div style="font-size: 1.75rem; font-weight: 700; color: var(--accent);">${data.ebitda}</div>
+                <div style="background: var(--bg-tertiary); padding: 1.25rem; border-radius: 16px; border: 1.5px solid var(--border);">
+                    <div style="font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 600;">EBITDA</div>
+                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent);">${data.ebitda}</div>
                 </div>
-                <div style="background: var(--bg-tertiary); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border);">
-                    <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase;">Cash Flow</div>
-                    <div style="font-size: 1.75rem; font-weight: 700; color: var(--warning);">${data.cashFlow}</div>
+                <div style="background: var(--bg-tertiary); padding: 1.25rem; border-radius: 16px; border: 1.5px solid var(--border);">
+                    <div style="font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 600;">Cash Flow</div>
+                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--warning);">${data.cashFlow}</div>
                 </div>
-                <div style="background: var(--bg-tertiary); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border);">
-                    <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase;">P/E Ratio</div>
-                    <div style="font-size: 1.75rem; font-weight: 700;">${data.pe}</div>
+                <div style="background: var(--bg-tertiary); padding: 1.25rem; border-radius: 16px; border: 1.5px solid var(--border);">
+                    <div style="font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 600;">P/E Ratio</div>
+                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">${data.pe}</div>
                 </div>
-                <div style="background: var(--bg-tertiary); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border);">
-                    <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase;">Liquidity Ratio</div>
-                    <div style="font-size: 1.75rem; font-weight: 700; color: ${parseFloat(data.liquidity) > 1.5 ? 'var(--success)' : 'var(--danger)'};">${data.liquidity}</div>
+                <div style="background: var(--bg-tertiary); padding: 1.25rem; border-radius: 16px; border: 1.5px solid var(--border);">
+                    <div style="font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 600;">Liquidity</div>
+                    <div style="font-size: 1.5rem; font-weight: 700; color: ${parseFloat(data.liquidity) > 1.5 ? 'var(--success)' : 'var(--danger)'};">${data.liquidity}</div>
                 </div>
-                <div style="background: var(--bg-tertiary); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border);">
-                    <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase;">ROE</div>
-                    <div style="font-size: 1.75rem; font-weight: 700; color: var(--success);">${data.roe}</div>
+                <div style="background: var(--bg-tertiary); padding: 1.25rem; border-radius: 16px; border: 1.5px solid var(--border);">
+                    <div style="font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 600;">ROE</div>
+                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--success);">${data.roe}</div>
                 </div>
-                <div style="background: var(--bg-tertiary); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border);">
-                    <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase;">Total Debt</div>
-                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--danger);">${data.debt}</div>
+                <div style="background: var(--bg-tertiary); padding: 1.25rem; border-radius: 16px; border: 1.5px solid var(--border);">
+                    <div style="font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 600;">Total Debt</div>
+                    <div style="font-size: 1.35rem; font-weight: 700; color: var(--danger);">${data.debt}</div>
                 </div>
-                <div style="background: var(--bg-tertiary); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border);">
-                    <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase;">Employees</div>
-                    <div style="font-size: 1.5rem; font-weight: 700;">${data.employees}</div>
+                <div style="background: var(--bg-tertiary); padding: 1.25rem; border-radius: 16px; border: 1.5px solid var(--border);">
+                    <div style="font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 600;">Employees</div>
+                    <div style="font-size: 1.35rem; font-weight: 700; color: var(--text-primary);">${data.employees}</div>
                 </div>
-                <div style="background: var(--bg-tertiary); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border);">
-                    <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase;">Founded</div>
-                    <div style="font-size: 1.5rem; font-weight: 700;">${data.founded}</div>
+                <div style="background: var(--bg-tertiary); padding: 1.25rem; border-radius: 16px; border: 1.5px solid var(--border);">
+                    <div style="font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 600;">Founded</div>
+                    <div style="font-size: 1.35rem; font-weight: 700; color: var(--text-primary);">${data.founded}</div>
                 </div>
             </div>
             
-            <div style="background: linear-gradient(135deg, rgba(58, 166, 255, 0.1), rgba(58, 166, 255, 0.05)); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(58, 166, 255, 0.2);">
-                <h3 style="font-size: 1.1rem; margin-bottom: 0.75rem; color: var(--accent);">📍 ${data.headquarters}</h3>
-                <p style="color: var(--text-secondary); line-height: 1.6; margin: 0;">
+            <div style="background: var(--accent-light); padding: 1.5rem; border-radius: 16px; border: 1.5px solid var(--accent);">
+                <h3 style="font-size: 0.9rem; margin-bottom: 0.75rem; color: var(--accent); font-weight: 600; text-transform: uppercase;">Company Profile</h3>
+                <p style="color: var(--text-primary); line-height: 1.6; margin: 0; font-size: 0.875rem;">
                     ${supplierName} is a leading global supplier of power generation equipment, specializing in turbines, generators, and complete power island solutions for fossil fuel and renewable energy plants.
                 </p>
             </div>
@@ -443,6 +506,7 @@ function updateStats() {
 }
 
 function createCharts() {
+    console.log('Creating charts...');
     Chart.defaults.color = '#586069';
     Chart.defaults.borderColor = '#e1e4e8';
 
@@ -458,31 +522,40 @@ function createCharts() {
         'rgba(253, 140, 115, 0.7)'  // Coral
     ];
 
+    // Destroy existing charts
+    Object.values(charts).forEach(chart => {
+        if (chart) chart.destroy();
+    });
+    charts = {};
+
     // Country chart
     const countryData = {};
     filteredPlants.forEach(p => countryData[p.country] = (countryData[p.country] || 0) + 1);
     const topCountries = Object.entries(countryData).sort((a, b) => b[1] - a[1]).slice(0, 10);
 
-    charts.country = new Chart(document.getElementById('countryChart'), {
-        type: 'bar',
-        data: {
-            labels: topCountries.map(([c]) => c),
-            datasets: [{
-                data: topCountries.map(([, v]) => v),
-                backgroundColor: chartColors,
-                borderRadius: 8
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-                y: { beginAtZero: true, grid: { color: 'rgba(45, 52, 54, 0.5)' } },
-                x: { grid: { display: false } }
+    const countryCanvas = document.getElementById('countryChart');
+    if (countryCanvas) {
+        charts.country = new Chart(countryCanvas, {
+            type: 'bar',
+            data: {
+                labels: topCountries.map(([c]) => c),
+                datasets: [{
+                    data: topCountries.map(([, v]) => v),
+                    backgroundColor: chartColors,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(225, 228, 232, 0.5)' } },
+                    x: { grid: { display: false } }
+                }
             }
-        }
-    });
+        });
+    }
 
     // Capacity histogram
     const capacityBuckets = [20, 100, 200, 500, 1000, 2000, 5000];
@@ -494,53 +567,59 @@ function createCharts() {
         }).length;
     });
 
-    charts.capacity = new Chart(document.getElementById('capacityChart'), {
-        type: 'bar',
-        data: {
-            labels: ['20-100', '100-200', '200-500', '500-1000', '1000-2000', '2000+'],
-            datasets: [{
-                label: 'Plants',
-                data: capacityData.slice(0, -1),
-                backgroundColor: chartColors,
-                borderRadius: 8
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-                y: { beginAtZero: true, grid: { color: 'rgba(45, 52, 54, 0.5)' } },
-                x: { grid: { display: false } }
+    const capacityCanvas = document.getElementById('capacityChart');
+    if (capacityCanvas) {
+        charts.capacity = new Chart(capacityCanvas, {
+            type: 'bar',
+            data: {
+                labels: ['20-100', '100-200', '200-500', '500-1000', '1000-2000', '2000+'],
+                datasets: [{
+                    label: 'Plants',
+                    data: capacityData.slice(0, -1),
+                    backgroundColor: chartColors,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(225, 228, 232, 0.5)' } },
+                    x: { grid: { display: false } }
+                }
             }
-        }
-    });
+        });
+    }
 
     // Fuel type chart with rounded segments
     const fuelData = {};
     filteredPlants.forEach(p => fuelData[p.energy_source] = (fuelData[p.energy_source] || 0) + 1);
 
-    charts.fuel = new Chart(document.getElementById('fuelChart'), {
-        type: 'doughnut',
-        data: {
-            labels: Object.keys(fuelData),
-            datasets: [{
-                data: Object.values(fuelData),
-                backgroundColor: chartColors,
-                borderWidth: 2,
-                borderColor: '#ffffff',
-                borderRadius: 8,
-                spacing: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { position: 'right', labels: { color: '#24292e', font: { size: 11 } } }
+    const fuelCanvas = document.getElementById('fuelChart');
+    if (fuelCanvas) {
+        charts.fuel = new Chart(fuelCanvas, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(fuelData),
+                datasets: [{
+                    data: Object.values(fuelData),
+                    backgroundColor: chartColors,
+                    borderWidth: 2,
+                    borderColor: '#ffffff',
+                    borderRadius: 8,
+                    spacing: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right', labels: { color: '#24292e', font: { size: 11 } } }
+                }
             }
-        }
-    });
+        });
+    }
 
     // Supplier chart
     const supplierData = {};
@@ -554,33 +633,35 @@ function createCharts() {
     });
     const topSuppliers = Object.entries(supplierData).sort((a, b) => b[1] - a[1]).slice(0, 8);
 
-    charts.supplier = new Chart(document.getElementById('supplierChart'), {
-        type: 'bar',
-        data: {
-            labels: topSuppliers.map(([s]) => s),
-            datasets: [{
-                data: topSuppliers.map(([, v]) => v),
-                backgroundColor: chartColors,
-                borderRadius: 8
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            indexAxis: 'y',
-            plugins: { legend: { display: false } },
-            scales: {
-                x: { beginAtZero: true, grid: { color: 'rgba(225, 228, 232, 0.5)' }, ticks: { font: { size: 11 } } },
-                y: { grid: { display: false }, ticks: { font: { size: 11 } } }
+    const supplierCanvas = document.getElementById('supplierChart');
+    if (supplierCanvas) {
+        charts.supplier = new Chart(supplierCanvas, {
+            type: 'bar',
+            data: {
+                labels: topSuppliers.map(([s]) => s),
+                datasets: [{
+                    data: topSuppliers.map(([, v]) => v),
+                    backgroundColor: chartColors,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { beginAtZero: true, grid: { color: 'rgba(225, 228, 232, 0.5)' }, ticks: { font: { size: 11 } } },
+                    y: { grid: { display: false }, ticks: { font: { size: 11 } } }
+                }
             }
-        }
-    });
+        });
+    }
+
+    console.log('Charts created:', Object.keys(charts));
 }
 
 function updateCharts() {
-    if (charts.country) {
-        Object.values(charts).forEach(chart => chart.destroy());
-    }
     createCharts();
 }
 
