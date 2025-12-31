@@ -17,11 +17,7 @@ complete_*.py
 get_next_*.py
 add_*.py
 
-# Documentation files (keep only README.md)
-VERIFICATION_COMPLETE.md
-verification_progress_report.md
-detailed_verification_findings.md
-session_summary.md
+
 
 # IDE and editor files
 .vscode/

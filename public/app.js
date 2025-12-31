@@ -45,7 +45,7 @@ function initMap() {
 }
 
 function loadData() {
-    fetch('./eu_fossil_powerplants_with_suppliers.csv')
+    fetch('./data/eu_fossil_powerplants_with_suppliers.csv')
         .then(response => response.text())
         .then(csvText => {
             Papa.parse(csvText, {
